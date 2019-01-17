@@ -1,0 +1,42 @@
+
+-- /u/lifow
+-- https://www.reddit.com/r/adventofcode/comments/3v8roh/day_3_solutions/cxljj8z/ 
+
+-- Part 1
+import Data.List    
+
+type House = (Integer, Integer)
+type Movement = (Integer, Integer)    
+
+move :: House -> Movement -> House
+move (x, y) (dx, dy) = (x + dx, y + dy)    
+
+arrowToMovement :: Char -> Movement
+arrowToMovement a
+    | a == '>' = ( 1,  0)
+    | a == '<' = (-1,  0)
+    | a == '^' = ( 0,  1)
+    | a == 'v' = ( 0, -1)    
+
+listHouses :: String -> [House]
+listHouses = scanl' move (0, 0) . map arrowToMovement    
+
+noOfUniqueHouses :: String -> Int
+noOfUniqueHouses = length . nub . listHouses    
+
+-- Part 2
+everyOther :: [a] -> [a]
+everyOther []     = []
+everyOther (x:xs) = x:(everyOther $ drop 1 xs)    
+
+noOfUniqueHouses' :: String -> Int
+noOfUniqueHouses' instructions = length . nub $ (santaHouses ++ roboHouses)
+  where
+    santaHouses = listHouses . everyOther $ instructions
+    roboHouses  = listHouses . everyOther . tail $ instructions
+
+main = do
+  input <- readFile "input.txt"
+  putStrLn $ "Part A: " ++ show (noOfUniqueHouses input)
+  putStrLn $ "Part B: " ++ show (noOfUniqueHouses' input)
+    
